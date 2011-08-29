@@ -104,8 +104,6 @@ function by_character(e) {
       })
   ;
 
-  // update the hash, but don't change on-screen scroll position
-  e.preventDefault();
-  location.hash = '#'+ name;
-  window.scrollTo(x, y);
+  // don't change on-screen scroll position when clicked
+  setTimeout(function() { window.scrollTo(x, y); }, 0);
 }

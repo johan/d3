@@ -13,8 +13,8 @@ title: Recettear Item Data
 <div class="items clearfix"> </div>
 
 <link type="text/css" rel="stylesheet" href="recettear/styles.css"/>
-<script src="../../d3.layout.js?2.0.3"> </script>
-<script src="../../d3.geom.js?2.0.3"> </script>
+<script src="../d3.layout.js?2.0.3"> </script>
+<script src="../d3.geom.js?2.0.3"> </script>
 <script src="recettear/data.js"> </script>
 <script src='recettear/items.js'> </script>
 
