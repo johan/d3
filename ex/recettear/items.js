@@ -1,14 +1,6 @@
 var style = document.createElement('style')
   , head  = document.head || document.getElementsByTagName('head')[0]
-  , css   = '.item {\n'
-          + '  float: left; margin: 0 2px 7px; display: block;\n'
-          + '  width: 32px; height: 32px; padding: 12px 15px 12px 14px;\n'
-          + '  background: url("recettear/gfx/misc/badge.png") no-repeat;\n'
-          + '  color:transparent; text-indent: -10em; text-decoration: none;\n'
-          + '}\n'
-          + '.item .icon {\n'
-          + '  width: 32px; height: 32px;\n'
-          + '}\n'
+  , css   = ''
   , iids  = {}
   ;
 
@@ -57,17 +49,29 @@ var chars = d3.select('ul.characters')
   , I = pane.selectAll('.item').data(items).enter().append('a')
     .attr('class', 'item')
     .attr('href', wiki_url)
+    .attr('id', _item_id)
     .attr('title', _name)
-    .append('div')
-      .attr('class', function(i) {
-         var id = i.id.match(/\d\d/g);
-         return 'icon ty'+ id[0] +' it'+ id[1];
-       })
   ;
+
+  // add item image (sprited) icon
+  I.append('div')
+    .attr('class', function(i) {
+      var id = i.id.match(/\d\d/g);
+      return 'icon ty'+ id[0] +' it'+ id[1];
+    });
+
+  // make items findable via Ctrl/Cmd-F (centering titles below)
+  I.append('label')
+    .text(_name)
+    .attr('for', _item_id)
+    .style('margin-left', function() {
+      return - (this.offsetWidth >> 1) +'px';
+    });
 
 // 64 = item badge height
 pdiv.style.height = (maxh - maxh % 64) + 'px';
 document.body.addEventListener('mousemove', show_users, false);
+document.body.addEventListener('DOMFocusIn', show_users, false);
 
 by_character((location.hash || '').slice(1));
 
@@ -88,6 +92,8 @@ function y_pos(node) {
 
 function _id(c)   { return c.id; }
 function _name(c) { return c.name; }
+function pluck(n) { return function(x) { return x && x[n]; }; }
+function _item_id(i) { return 'i'+ i.id; }
 function wiki_url(item) {
   var name = (
       { "Assassin Blade": "Assassin's Blade"

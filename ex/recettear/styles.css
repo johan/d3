@@ -29,6 +29,36 @@ line.link {
   margin:     8px 0;
   width:      736px;
   overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.item {
+  float:      left;
+  display:    block;
+  margin:     0 2px 7px;
+  width:      32px;
+  height:     32px;
+  padding:    12px 15px 12px 14px;
+  background: url("gfx/misc/badge.png") no-repeat;
+  position:   relative;
+  color:      transparent;
+}
+
+.item .icon {
+  width:  32px;
+  height: 32px;
+}
+
+.item label {
+  position:    absolute;
+  left:        30px;
+  bottom:      -10px;
+  white-space: nowrap;
+  /* margin-left set by code */
+}
+
+.item:focus label {
+  color: #000;
 }
 
 .clearfix:after {
@@ -63,13 +93,20 @@ line.link {
 }
 
 .characters a {
+  display:          block;
   float:            left;
   width:            80px;
   height:           80px;
-  display:          block;
   background-color: transparent;
   color:            transparent;
+  text-align:       center; /* center name */
+  line-height:      160px;  /* below image */
 }
+
+.characters a:focus {
+  color: #000;
+}
+
 
 .character a {
   background-image: url("gfx/misc/avatars.png");
