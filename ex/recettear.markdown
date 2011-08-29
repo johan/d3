@@ -18,9 +18,8 @@ title: Recettear Item Data
 <script src="recettear/data.js"> </script>
 <script src='recettear/items.js'> </script>
 
-Layout inspired by
-[Mike Bostock](http://mbostock.github.com/d3/ex/force.html).
-Data from
-[Recettear](http://www.carpefulgur.com/recettear/) v1.108 (English);
-wiki links courtesy of
-[Wikia](http://recettear.wikia.com/wiki/).
+<div id="credits">
+Layout inspired by <a href="http://mbostock.github.com/d3/ex/force.html">Mike Bostock</a>.
+Data from <a href="http://www.carpefulgur.com/recettear/">Recettear</a> v1.108 (English).
+Wiki item links courtesy of <a href="http://recettear.wikia.com/wiki/">Wikia</a>.
+</div>

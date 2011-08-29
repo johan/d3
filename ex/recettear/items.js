@@ -19,6 +19,7 @@ categories.forEach(function (cat) {
 items.forEach(function (item) {
   var iid = item.id.slice(2);
   iids[iid] = Number(iid);
+  item.is_item = true;
 });
 for (var iid in iids) {
   var c = iid % 8, r = iid >> 3
@@ -37,8 +38,8 @@ var vis = d3.select("#chart")
     .attr("width", w)
     .attr("height", h);
 
-// character selection
-d3.select('ul.characters')
+// for character selection (and showing users of items)
+var chars = d3.select('ul.characters')
   .selectAll('li.character').data(characters)
   .enter().append('li') // "anyone" is in the document already
     .attr('class', 'character')
@@ -49,11 +50,11 @@ d3.select('ul.characters')
      .attr('title', _name)
      .attr('onclick', 'by_character(event)')
      .attr('href', function(c) { return '#'+ c.name; })
-  ;
 
-d3.select('.items')
-  .selectAll('.item').data(items)
-  .enter().append('a')
+  , pane = d3.select('.items')
+  , pdiv = pane.node()
+  , maxh = window.innerHeight - y_pos(pdiv) - 8
+  , I = pane.selectAll('.item').data(items).enter().append('a')
     .attr('class', 'item')
     .attr('href', wiki_url)
     .attr('title', _name)
@@ -64,7 +65,26 @@ d3.select('.items')
        })
   ;
 
+// 64 = item badge height
+pdiv.style.height = (maxh - maxh % 64) + 'px';
+document.body.addEventListener('mousemove', show_users, false);
+
 by_character((location.hash || '').slice(1));
+
+function show_users(e) {
+  function is_user(ch) {
+    if (!item || !item.chars) return false;
+    return -1 !== item.chars.indexOf(ch.name);
+  }
+  var item = e.target.__data__;
+  if (item && !item.is_item) item = false;
+  chars.classed('user', is_user);
+}
+
+function y_pos(node) {
+  var pn = node.offsetParent || 0;
+  return node.offsetTop + (pn && y_pos(pn));
+}
 
 function _id(c)   { return c.id; }
 function _name(c) { return c.name; }

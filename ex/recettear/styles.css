@@ -8,6 +8,15 @@ line.link {
   stroke-opacity: .6;
 }
 
+.foot { display: none; }
+
+#credits {
+  bottom:     0;
+  width:      240px;
+  left:       -260px;
+  position:   absolute;
+  text-align: right;
+}
 
 .sidebar {
   height:           110px;
@@ -17,7 +26,9 @@ line.link {
 }
 
 .items {
-  margin: 8px 0;
+  margin:     8px 0;
+  width:      736px;
+  overflow-y: scroll;
 }
 
 .clearfix:after {
@@ -71,12 +82,12 @@ line.link {
 }
 
 /* Louie */
-.ch00, .ch00:hover {
+.user.ch00, .ch00:hover {
   background-color:    #B3A66F;
 }
 
 /* Charme */
-.ch01, .ch01:hover {
+.user.ch01, .ch01:hover {
   background-color:    #87849A;
 }
 .characters .ch01 {
@@ -84,7 +95,7 @@ line.link {
 }
 
 /* Caillou */
-.ch02, .ch02:hover {
+.user.ch02, .ch02:hover {
   background-color:    #809486;
 }
 .characters .ch02 {
@@ -92,7 +103,7 @@ line.link {
 }
 
 /* Tielle */
-.ch03, .ch03:hover {
+.user.ch03, .ch03:hover {
   background-color:    #DC8659;
   background-position: -240px 0;
 }
@@ -101,7 +112,7 @@ line.link {
 }
 
 /* Elan */
-.ch04, .ch04:hover {
+.user.ch04, .ch04:hover {
   background-color:    #836C3D;
 }
 .characters .ch04 {
@@ -109,7 +120,7 @@ line.link {
 }
 
 /* Nagi */
-.ch05, .ch05:hover {
+.user.ch05, .ch05:hover {
   background-color:    #7E6051;
 }
 .characters .ch05 {
@@ -117,7 +128,7 @@ line.link {
 }
 
 /* Griff */
-.ch06, .ch06:hover {
+.user.ch06, .ch06:hover {
   background-color:    #42373D;
 }
 .characters .ch06 {
@@ -125,7 +136,7 @@ line.link {
 }
 
 /* Arma */
-.ch07, .ch07:hover {
+.user.ch07, .ch07:hover {
   background-color:    #5F6934;
 }
 .characters .ch07 {
