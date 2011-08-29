@@ -8,6 +8,18 @@ line.link {
   stroke-opacity: .6;
 }
 
+
+.sidebar {
+  height:           110px;
+  background-size:  100%;
+  background-image: url("recettear/gfx/misc/recettear-title.png");
+  color:            transparent;
+}
+
+.items {
+  margin: 8px 0;
+}
+
 .clearfix:after {
   visibility: hidden;
   display:    block;
