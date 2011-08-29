@@ -1,0 +1,121 @@
+circle.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+line.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+.clearfix:after {
+  visibility: hidden;
+  display:    block;
+  clear:      both;
+  content:    ".";
+  height:     0;
+}
+
+
+/* horizontal character selection bar */
+.characters {
+  margin:  0;
+  padding: 0;
+  height:  80px;
+}
+
+.characters li {
+  float:            left;
+  display:          block;
+  list-style-image: none;
+  width:            80px;
+  height:           80px;
+}
+
+.characters li.selected {
+  background:       url("gfx/misc/avatar-bg.png");
+}
+.characters li.selected :hover {
+  background-color: transparent;
+}
+
+.characters a {
+  float:            left;
+  width:            80px;
+  height:           80px;
+  display:          block;
+  background-color: transparent;
+  color:            transparent;
+}
+
+.character a {
+  background-image: url("gfx/misc/avatars.png");
+}
+
+
+.Anyone, .Anyone:hover {
+  background-image:    none;
+  background-color:    #DDD;
+}
+
+/* Louie */
+.ch00, .ch00:hover {
+  background-color:    #B3A66F;
+}
+
+/* Charme */
+.ch01, .ch01:hover {
+  background-color:    #87849A;
+}
+.characters .ch01 {
+  background-position: -80px 0;
+}
+
+/* Caillou */
+.ch02, .ch02:hover {
+  background-color:    #809486;
+}
+.characters .ch02 {
+  background-position: -160px 0;
+}
+
+/* Tielle */
+.ch03, .ch03:hover {
+  background-color:    #DC8659;
+  background-position: -240px 0;
+}
+.characters .ch03 {
+  background-position: -240px 0;
+}
+
+/* Elan */
+.ch04, .ch04:hover {
+  background-color:    #836C3D;
+}
+.characters .ch04 {
+  background-position: -320px 0;
+}
+
+/* Nagi */
+.ch05, .ch05:hover {
+  background-color:    #7E6051;
+}
+.characters .ch05 {
+  background-position: -400px 0;
+}
+
+/* Griff */
+.ch06, .ch06:hover {
+  background-color:    #42373D;
+}
+.characters .ch06 {
+  background-position: -480px 0;
+}
+
+/* Arma */
+.ch07, .ch07:hover {
+  background-color:    #5F6934;
+}
+.characters .ch07 {
+  background-position: -560px 0;
+}
