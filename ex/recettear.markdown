@@ -11,6 +11,7 @@ title: Recettear Item Data
 </li>
 </ul>
 <div class="items clearfix"> </div>
+<ul class="dungeons clearfix"> </ul>
 
 <link type="text/css" rel="stylesheet" href="recettear/styles.css"/>
 <script src="../d3.layout.js?2.0.3"> </script>

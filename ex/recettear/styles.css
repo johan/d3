@@ -71,18 +71,29 @@ line.link {
 
 
 /* horizontal character selection bar */
-.characters {
+.characters, .dungeons {
   margin:  0;
   padding: 0;
   height:  80px;
 }
+.dungeons {
+  height:  120px;
+}
 
-.characters li {
+.characters li, .dungeons li {
   float:            left;
   display:          block;
   list-style-image: none;
   width:            80px;
   height:           80px;
+}
+.dungeons li, .dungeons li a {
+  display:          block;
+  width:            120px;
+  height:           120px;
+}
+.dungeons li {
+  background-image: url("gfx/misc/dungeons.png");
 }
 
 .characters li.selected {
@@ -107,10 +118,37 @@ line.link {
   color: #000;
 }
 
-
 .character a {
   background-image: url("gfx/misc/avatars.png");
 }
+
+.dungeons a {
+  display:          block;
+  float:            left;
+  width:            120px;
+  height:           120px;
+  background-color: transparent;
+  color:            transparent;
+  text-align:       center; /* center name */
+  line-height:      240px;  /* below image */
+  overflow-y:       hidden;
+}
+
+.dungeons a:focus {
+  color: #000;
+}
+
+/* "item X appears in a chest of dungeon Y" */
+.dungeon.chest a {
+  background: url("gfx/misc/chest.png") no-repeat bottom right;
+}
+/* sub-ideal; there's cognitive dissonance when you select a dungeon,
+ * hover an item that isn't in that dungeon's chests, and the icon is
+ * still lit. Any graphics artists out there that want to improve this? */
+.dungeon.selected a {
+  background: url("gfx/misc/chest.png") no-repeat bottom right;
+}
+
 
 
 .Anyone, .Anyone:hover {

@@ -8,6 +8,10 @@ categories.forEach(function (cat) {
   css += '.ty'+ cat.id +' { background-image: url("recettear/gfx/items/item'
        + cat.id +'.gif"); }\n';
 });
+dungeons.forEach(function (d) {
+  var dx = (d.id - 1) * -128 + 4;
+  css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
+});
 items.forEach(function (item) {
   var iid = item.id.slice(2);
   iids[iid] = Number(iid);
@@ -31,7 +35,7 @@ var vis = d3.select("#chart")
     .attr("height", h);
 
 // for character selection (and showing users of items)
-var chars = d3.select('ul.characters')
+var C = d3.select('ul.characters')
   .selectAll('li.character').data(characters)
   .enter().append('li') // "anyone" is in the document already
     .attr('class', 'character')
@@ -43,6 +47,7 @@ var chars = d3.select('ul.characters')
      .attr('onclick', 'by_character(event)')
      .attr('href', function(c) { return '#'+ c.name; })
 
+  , _slice = Array.prototype.slice
   , pane = d3.select('.items')
   , pdiv = pane.node()
   , maxh = window.innerHeight - y_pos(pdiv) - 8
@@ -51,6 +56,10 @@ var chars = d3.select('ul.characters')
     .attr('href', wiki_url)
     .attr('id', _item_id)
     .attr('title', _name)
+  , D = d3.select('ul.dungeons')
+          .selectAll('li.dungeon').data(dungeons)
+          .enter().append('li')
+            .attr('class', function(d) { return 'dungeon du'+ d.id; })
   ;
 
   // add item image (sprited) icon
@@ -68,21 +77,35 @@ var chars = d3.select('ul.characters')
       return - (this.offsetWidth >> 1) +'px';
     });
 
-// 64 = item badge height
-pdiv.style.height = (maxh - maxh % 64) + 'px';
-document.body.addEventListener('mousemove', show_users, false);
-document.body.addEventListener('DOMFocusIn', show_users, false);
+  // make chested items findable by dungeon (and set dungeon expectations)
+  D.append('a')
+    .text(_name)
+    .attr('id', _name)
+    .attr('title', _name)
+    .attr('onclick', 'by_dungeon(event)')
+    .attr('href', function(d) { return '#'+ d.name; });
+
+// 64 = item badge height, 120 = dungeon icon height
+pdiv.style.height = (maxh - maxh % 64 - 120) + 'px';
+document.body.addEventListener('mousemove', show_item, false);
+document.body.addEventListener('DOMFocusIn', show_item, false);
 
 by_character((location.hash || '').slice(1));
 
-function show_users(e) {
+function show_item(e) {
   function is_user(ch) {
     if (!item || !item.chars) return false;
     return -1 !== item.chars.indexOf(ch.name);
   }
-  var item = e.target.__data__;
+  var at = e.target, item = at.__data__;
   if (item && !item.is_item) item = false;
-  chars.classed('user', is_user);
+  C.classed('user', is_user);
+
+  // if we're hovering the dungeon panel, don't touch it
+  if (/dungeon/.test(at && at.getAttribute('onclick') || '')) return;
+  D.classed('chest', function(d) {
+    return item && is_in_dungeon(d.id, item);
+  });
 }
 
 function y_pos(node) {
@@ -93,12 +116,49 @@ function y_pos(node) {
 function _id(c)   { return c.id; }
 function _name(c) { return c.name; }
 function pluck(n) { return function(x) { return x && x[n]; }; }
+function array(a, n) { return _slice.call(a, n||0); }
+function partial(fn) {
+  var args = array(arguments, 1);
+  return function() { return fn.apply(this, args.concat(array(arguments))); };
+}
 function _item_id(i) { return 'i'+ i.id; }
 function wiki_url(item) {
   var name = (
       { "Assassin Blade": "Assassin's Blade"
       })[item.name] || item.name;
   return 'http://recettear.wikia.com/wiki/' + name.replace(/ /g, '_');
+}
+
+function by_dungeon(e) {
+  var name = 'object' === typeof e ? e.target.id : e
+    , x    = window.pageXOffset
+    , y    = window.pageYOffset
+    , id, d, i, min, max;
+  for (i = 0; d = dungeons[i]; i++)
+    if (d.name === name) {
+      id = d.id;
+      break;
+    }
+  if (!id) return;
+  min = 10 * id;
+  max = 10 + min;
+  by_character('Anyone'); // reset character view
+
+  D.classed('selected', 0).classed('chest', 0);
+  d3.select(document.getElementById(name).parentNode).classed('selected', 1);
+
+  I.transition().duration(250)
+    .style('opacity', function(item) {
+      return is_in_dungeon(id, item) ? 1 : 0.25;
+    });
+}
+
+function is_in_dungeon(no, item) {
+  function exists(min_level) {
+    return min <= min_level && min_level < max;
+  }
+  var min = no * 10, max = 10 + min;
+  return (item.where.chest || []).filter(exists).length;
 }
 
 function by_character(e) {
@@ -115,7 +175,8 @@ function by_character(e) {
   if (!id && !any) return;
   //console.info(name);
 
-  d3.select('li.selected').classed('selected', 0);
+  D.classed('chest', 0).classed('selected', 0);
+  d3.select('.characters li.selected').classed('selected', 0);
   d3.select(document.getElementById(name).parentNode).classed('selected', 1);
 
   d3.select('.items')
