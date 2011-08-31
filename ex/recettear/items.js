@@ -28,6 +28,12 @@ function init(item_urls) {
     items[idx].is_item = 1;
   });
 
+  // sort characters by sex, to make some item usage distribution more intuitive
+  characters.sort(function by_sex(a, b) {
+    var A = Number(a.id.slice(2)), B = Number(b.id.slice(2));
+    return (((A & 1) << 3) + A) - (((B & 1) << 3) + B);
+  });
+
   dungeons.forEach(function (d) {
     var dx = (d.id - 1) * -128 + 4;
     css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
