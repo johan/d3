@@ -1,41 +1,29 @@
-var style = document.createElement('style')
-  , head  = document.head || document.getElementsByTagName('head')[0]
-  , css   = ''
-  , iids  = {}
+var style  = document.createElement('style')
+  , head   = document.head || document.getElementsByTagName('head')[0]
+  , css    = ''
+  , _slice = Array.prototype.slice
+  , C, I, D // character, item and dungeon visualizations respectively
+
+//  , w     = 960
+//  , h     = 500
+//  , fill  = d3.scale.category20()
+//  , vis = d3.select("#chart")
+//    .append("svg:svg")
+//      .attr("width", w)
+//      .attr("height", h)
+//
   ;
 
-categories.forEach(function (cat) {
-  css += '.ty'+ cat.id +' { background-image: url("recettear/gfx/items/item'
-       + cat.id +'.gif"); }\n';
-});
-dungeons.forEach(function (d) {
-  var dx = (d.id - 1) * -128 + 4;
-  css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
-});
-items.forEach(function (item) {
-  var iid = item.id.slice(2);
-  iids[iid] = Number(iid);
-  item.is_item = true;
-});
-for (var iid in iids) {
-  var c = iid % 8, r = iid >> 3
-    , x = -32 * c, y = -32 * r;
-  css += '.it'+ iid +' { background-position: '+ x +'px '+ y +'px; }\n';
-}
-style.innerHTML = css;
-head.appendChild(style);
+load(init);
 
-var w = 960,
-    h = 500,
-    fill = d3.scale.category20();
+function init() {
+  var items_pane = d3.select('.items')
+    , items_node = items_pane.node()
+    , max_height
+    ;
 
-var vis = d3.select("#chart")
-  .append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
-
-// for character selection (and showing users of items)
-var C = d3.select('ul.characters')
+  // for character selection (and showing users of items)
+  C = d3.select('ul.characters')
   .selectAll('li.character').data(characters)
   .enter().append('li') // "anyone" is in the document already
     .attr('class', 'character')
@@ -45,29 +33,23 @@ var C = d3.select('ul.characters')
      .attr('class', _id) // (styling)
      .attr('title', _name)
      .attr('onclick', 'by_character(event)')
-     .attr('href', function(c) { return '#'+ c.name; })
+     .attr('href', function(c) { return '#'+ c.name; });
 
-  , _slice = Array.prototype.slice
-  , pane = d3.select('.items')
-  , pdiv = pane.node()
-  , maxh = window.innerHeight - y_pos(pdiv) - 8
-  , I = pane.selectAll('.item').data(items).enter().append('a')
+  // the main items pane
+  I = items_pane.selectAll('.item').data(items).enter().append('a')
     .attr('class', 'item')
     .attr('href', wiki_url)
     .attr('id', _item_id)
-    .attr('title', _name)
-  , D = d3.select('ul.dungeons')
-          .selectAll('li.dungeon').data(dungeons)
-          .enter().append('li')
-            .attr('class', function(d) { return 'dungeon du'+ d.id; })
-  ;
+    .attr('title', _name);
 
-  // add item image (sprited) icon
-  I.append('div')
-    .attr('class', function(i) {
-      var id = i.id.match(/\d\d/g);
-      return 'icon ty'+ id[0] +' it'+ id[1];
-    });
+  // the dungeon selector
+  D = d3.select('ul.dungeons')
+    .selectAll('li.dungeon').data(dungeons)
+    .enter().append('li')
+      .attr('class', function(d) { return 'dungeon du'+ d.id; });
+
+  // add item image icon
+  I.append('img').attr('src', _image);
 
   // make items findable via Ctrl/Cmd-F (centering titles below)
   I.append('label')
@@ -85,12 +67,55 @@ var C = d3.select('ul.characters')
     .attr('onclick', 'by_dungeon(event)')
     .attr('href', function(d) { return '#'+ d.name; });
 
-// 64 = item badge height, 120 = dungeon icon height
-pdiv.style.height = (maxh - maxh % 64 - 120) + 'px';
-document.body.addEventListener('mousemove', show_item, false);
-document.body.addEventListener('DOMFocusIn', show_item, false);
+  max_height = window.innerHeight - y_pos(items_node) - 8;
 
-by_character((location.hash || '').slice(1));
+  // 64 = item badge height, 120 = dungeon icon height
+  items_node.style.height = (max_height - max_height % 64 - 120) + 'px';
+  document.body.addEventListener('mousemove', show_item, false);
+  document.body.addEventListener('DOMFocusIn', show_item, false);
+
+  by_character((location.hash || '').slice(1));
+
+}
+
+function load(cb) {
+  function cut(e) {
+    var img = this
+      , cat = categories[images.indexOf(img)];
+    items.forEach(function(item) {
+      var cid = item.id.slice(0, 2);
+      if (cid !== cat.id) return;
+      item.is_item = true;
+      var iid = Number(item.id.slice(2))
+        , row = iid >> 3, h = 32, y = h * row
+        , col = iid % 8,  w = 32, x = w * col;
+      item.image = imageURL(img, x, y, w, h);
+    });
+    if (!--left) cb();
+  }
+  var images = [], left, img, i, cat;
+
+  for (left = 0; cat = categories[left]; left++) {
+    images.push(img = new Image);
+    img.onload = cut;
+    img.src = 'recettear/gfx/items/item' + cat.id + '.gif';
+  }
+
+  dungeons.forEach(function (d) {
+    var dx = (d.id - 1) * -128 + 4;
+    css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
+  });
+  style.innerHTML = css;
+  head.appendChild(style);
+}
+
+function imageURL(img, x, y, w, h) {
+  var canvas = document.createElement('canvas'), ctx;
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext('2d').drawImage(img, x, y, w, h, 0, 0, w, h);
+  return canvas.toDataURL("image/png");
+}
 
 function show_item(e) {
   function is_user(ch) {
@@ -113,8 +138,9 @@ function y_pos(node) {
   return node.offsetTop + (pn && y_pos(pn));
 }
 
-function _id(c)   { return c.id; }
-function _name(c) { return c.name; }
+function _id(c)    { return c.id; }
+function _name(c)  { return c.name; }
+function _image(i) { return i.image; }
 function pluck(n) { return function(x) { return x && x[n]; }; }
 function array(a, n) { return _slice.call(a, n||0); }
 function partial(fn) {
