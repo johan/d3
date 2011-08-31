@@ -14,13 +14,26 @@ var style  = document.createElement('style')
 //
   ;
 
-load(init);
+// url : array of item indices with that image
+d3.json('recettear/itemimages.json', init);
 
-function init() {
+function init(item_urls) {
   var items_pane = d3.select('.items')
     , items_node = items_pane.node()
     , max_height
     ;
+
+  for (var url in item_urls) item_urls[url].forEach(function(idx) {
+    items[idx].image = url;
+    items[idx].is_item = 1;
+  });
+
+  dungeons.forEach(function (d) {
+    var dx = (d.id - 1) * -128 + 4;
+    css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
+  });
+  style.innerHTML = css;
+  head.appendChild(style);
 
   // for character selection (and showing users of items)
   C = d3.select('ul.characters')
@@ -42,14 +55,8 @@ function init() {
     .attr('id', _item_id)
     .attr('title', _name);
 
-  // the dungeon selector
-  D = d3.select('ul.dungeons')
-    .selectAll('li.dungeon').data(dungeons)
-    .enter().append('li')
-      .attr('class', function(d) { return 'dungeon du'+ d.id; });
-
   // add item image icon
-  I.append('img').attr('src', _image);
+  I.append('img').attr('width', 32).attr('height', 32).attr('src', _image);
 
   // make items findable via Ctrl/Cmd-F (centering titles below)
   I.append('label')
@@ -58,6 +65,12 @@ function init() {
     .style('margin-left', function() {
       return - (this.offsetWidth >> 1) +'px';
     });
+
+  // the dungeon selector
+  D = d3.select('ul.dungeons')
+    .selectAll('li.dungeon').data(dungeons)
+    .enter().append('li')
+      .attr('class', function(d) { return 'dungeon du'+ d.id; });
 
   // make chested items findable by dungeon (and set dungeon expectations)
   D.append('a')
@@ -75,38 +88,6 @@ function init() {
   document.body.addEventListener('DOMFocusIn', show_item, false);
 
   by_character((location.hash || '').slice(1));
-
-}
-
-function load(cb) {
-  function cut(e) {
-    var img = this
-      , cat = categories[images.indexOf(img)];
-    items.forEach(function(item) {
-      var cid = item.id.slice(0, 2);
-      if (cid !== cat.id) return;
-      item.is_item = true;
-      var iid = Number(item.id.slice(2))
-        , row = iid >> 3, h = 32, y = h * row
-        , col = iid % 8,  w = 32, x = w * col;
-      item.image = imageURL(img, x, y, w, h);
-    });
-    if (!--left) cb();
-  }
-  var images = [], left, img, i, cat;
-
-  for (left = 0; cat = categories[left]; left++) {
-    images.push(img = new Image);
-    img.onload = cut;
-    img.src = 'recettear/gfx/items/item' + cat.id + '.gif';
-  }
-
-  dungeons.forEach(function (d) {
-    var dx = (d.id - 1) * -128 + 4;
-    css += '.du'+ d.id +' { background-position: '+ dx +'px 0px; }\n';
-  });
-  style.innerHTML = css;
-  head.appendChild(style);
 }
 
 function imageURL(img, x, y, w, h) {
