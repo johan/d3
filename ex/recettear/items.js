@@ -128,13 +128,19 @@ function bubbles() {
 
   var bubble = d3.layout.pack().sort(null).size([r, r]);
 
-  var node = vis.selectAll('g.node')
+  var node = vis.selectAll('.node')
         .data(bubble.nodes({ children: items.filter(pluck('value')) }))
-      .enter().append('svg:g')
+      .enter().append('svg:a')
+        .attr('xlink:href', wiki_url)
         .attr('class', 'node item')
         .attr('transform', function(d) {
           return 'translate('+ d.x +','+ d.y +')';
         });
+
+    node.append('svg:title')
+          .text(function(d) {
+            return d.name ? d.name +': '+ d.value +' total stats' : null;
+          });
 
     //node.append('svg:title')
     //    .text(function(d) { return d.name; });
@@ -153,7 +159,9 @@ function bubbles() {
                              return 'translate(-'+ dx +',-'+ dx +') '+ sz;
                            })
         .append('svg:title')
-          .text(function(d) { return d.name +': '+ d.value +' total stats'; });
+          .text(function(d) {
+             return d.name ? d.name +': '+ d.value +' total stats' : '';
+          });
 
     //node.append('svg:text')
     //    .attr('text-anchor', 'middle')
@@ -174,7 +182,7 @@ function show_item(e) {
     if (!item || !item.chars) return false;
     return -1 !== item.chars.indexOf(ch.name);
   }
-  var at = e.target, item = at.__data__;
+  var at = e.target, item = at.__data__ || at.parentNode.__data__;
   if (item && !item.is_item) item = false;
   C.classed('user', is_user);
 
@@ -201,6 +209,7 @@ function partial(fn) {
 }
 function _item_id(i) { return 'i'+ i.id; }
 function wiki_url(item) {
+  if (!item.name) return null;
   var name = (
       { "Assassin Blade": "Assassin's Blade"
       })[item.name] || item.name;
