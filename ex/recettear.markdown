@@ -10,10 +10,12 @@ title: Recettear Item Data
   <a id="Anyone" class="Anyone" href="#Anyone" title="Anyone" onclick="by_character(event)">Anyone</a>
 </li>
 </ul>
+<div id="chart" style="margin-left: -160px;"> </div>
 <div class="items clearfix"> </div>
 <ul class="dungeons clearfix"> </ul>
 
 <link type="text/css" rel="stylesheet" href="recettear/styles.css"/>
+<link type="text/css" rel="stylesheet" href="bubble.css"/>
 <script src="../d3.layout.js?2.0.3"> </script>
 <script src="../d3.geom.js?2.0.3"> </script>
 <script src="recettear/data.js"> </script>
