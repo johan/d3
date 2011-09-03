@@ -75,7 +75,7 @@ function init(item_urls) {
      .attr('href', function(c) { return '#'+ c.name; });
 
   bubbles();
-  I = d3.select('#chart').selectAll('.item');
+  I = d3.select('#chart').selectAll('a.item');
 
 /*
   // the main items pane
@@ -148,7 +148,9 @@ function bubbles() {
     node.append('svg:circle')
         .attr('class', 'item')
         .attr('r', function(d) { return d.r; })
-        .style('fill', function(d) { return fill(d.type); });
+        .style('fill', function(d) {
+          return d.children ? 'transparent' : fill(d.type);
+        });
 
     node.append('svg:use')
         .attr('class', 'item')
