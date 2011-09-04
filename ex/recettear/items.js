@@ -48,6 +48,11 @@ function init(item_urls) {
     , i = 0
     ;
 
+  defs.append('svg:image')
+      .attr('id', 'badge')
+      .attr('width', '1')   // 32px icon + 12px padding on both sides
+      .attr('height', '1') // 32px icon + 14.5px padding above and below
+      .attr('xlink:href', 'recettear/gfx/misc/badge.png');
   for (var url in item_urls) item_urls[url].forEach(function(idx) {
     var item = items[idx], id;
     item.value = pos_stats(item); // sum_stats(item);
@@ -177,19 +182,35 @@ function bubbles() {
     //node.append('svg:title')
     //    .text(function(d) { return d.name; });
 
+    /*
     node.append('svg:circle')
         .attr('class', 'item')
         .attr('r', function(d) { return d.r; })
         .style('fill', function(d) {
           return d.children ? 'transparent' : fill(d.type);
         });
+    */
+
+    var badge_factor = 1.25;
+    node.append('svg:use')
+        .attr('xlink:href', '#badge')
+        .attr('transform', function(d) {
+                             if (d.children) return '';
+                             var dr = d.r * badge_factor
+                               , dx = Math.sqrt(dr * dr / 2).toFixed(1);
+                             return 'scale('+ (2 * dx).toFixed(2) +') '
+                                  + 'translate(-0.5 -0.5)';
+                                //+ 'translate(-0.95 -0.875)';
+                                //+ 'translate(-' +(dx) +',-'+ (dx) +')';
+                           });
 
     node.append('svg:use')
         .attr('class', 'item')
         .attr('xlink:href', function(d) { return '#'+ d.img_id; })
         .attr('transform', function(d) {
-                             var dx = Math.sqrt(d.r * d.r / 2)
-                               , sz = 'scale('+ (2 * dx) +')';
+                             var dr = d.r
+                               , dx = Math.sqrt(dr * dr / 2).toFixed(1)
+                               , sz = 'scale('+ (2 * dx).toFixed(2) +')';
                              return 'translate(-'+ dx +',-'+ dx +') '+ sz;
                            })
         .append('svg:title')
