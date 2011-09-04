@@ -194,7 +194,7 @@ function bubbles() {
                            })
         .append('svg:title')
           .text(function(d) {
-             return d.name ? d.name +': '+ sum_stats(d.value) +' total stats'
+             return d.name ? d.name +': '+ sum_stats(d) +' total stats'
                            : '';
           });
 
