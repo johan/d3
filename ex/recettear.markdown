@@ -12,6 +12,7 @@ title: Recettear Item Data
 </ul>
 <div id="chart" style="margin-left: -160px;"> </div>
 <div class="items clearfix"> </div>
+<ul class="places clearfix"> </ul>
 <ul class="dungeons clearfix"> </ul>
 
 <link type="text/css" rel="stylesheet" href="recettear/styles.css"/>

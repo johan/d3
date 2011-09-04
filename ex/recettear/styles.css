@@ -80,6 +80,13 @@ line.link {
 .dungeons {
   height:  120px;
 }
+/* vertical location selection bar */
+.places {
+  position: absolute;
+  margin:   -174px 0 0 658px;
+  padding:  0;
+  width:    180px;
+}
 
 .characters li, .dungeons li {
   float:            left;
@@ -95,6 +102,13 @@ line.link {
 }
 .dungeons li {
   background-image: url("gfx/misc/dungeons.png");
+}
+.places li {
+  opacity:     0.5;
+  text-indent: -1000em
+}
+.places li.selected, .places li.here {
+  opacity: 1;
 }
 
 .characters li.selected {
@@ -218,3 +232,22 @@ line.link {
 .characters .ch07 {
   background-position: -560px 0;
 }
+
+.place {
+  list-style-image:  none;
+  background-image:  url("gfx/misc/places.png");
+  background-repeat: no-repeat;
+}
+.place, .place a {
+  display: block;
+  width:   180px;
+  height:  56px;
+}
+
+/* recettear:  { background-position: 0 0; */
+.place.square { background-positoin: 0 -56px; }
+.place.chapel { background-positoin: 0 -112px; }
+.place.market { background-position: 0 -168px; }
+.place.pub    { background-position: 0 -224px; }
+.place.guild  { background-position: 0 -280px; }
+.place.aguild { background-position: 0 -336px; }

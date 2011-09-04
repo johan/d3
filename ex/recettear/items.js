@@ -7,7 +7,7 @@ var style  = document.createElement('style')
       .attr('height', r)
       .attr('class', 'bubble')
   , _slice = Array.prototype.slice
-  , C, I, D // character, item and dungeon visualizations respectively
+  , C, I, P, D // character, item, place and dungeon visualizations respectively
 
 //  , w     = 960
 //  , h     = 500
@@ -50,7 +50,7 @@ function init(item_urls) {
 
   for (var url in item_urls) item_urls[url].forEach(function(idx) {
     var item = items[idx], id;
-    item.value = sum_stats(item);
+    item.value = pos_stats(item); // sum_stats(item);
     item.img_id = id = 'i' + i++;
     item.is_item = 1;
     defs.append('svg:image')
@@ -111,6 +111,20 @@ function init(item_urls) {
       return - (this.offsetWidth >> 1) +'px';
     });
 */
+
+  P = d3.select('ul.places')
+    .selectAll('li.place').data(locations)
+    .enter().append('li')
+      .attr('id', _id)
+      .attr('class', function(d) { return 'place '+ d.id; });
+
+  // make items findable by location
+  P.append('a')
+    .text(_name)
+    .attr('id', _name)
+    .attr('title', _name)
+    .attr('onclick', 'by_place(event)')
+    .attr('href', function(d) { return '#'+ d.name; });
 
   // the dungeon selector
   D = d3.select('ul.dungeons')
@@ -180,13 +194,14 @@ function bubbles() {
                            })
         .append('svg:title')
           .text(function(d) {
-             return d.name ? d.name +': '+ d.value +' total stats' : '';
+             return d.name ? d.name +': '+ sum_stats(d.value) +' total stats'
+                           : '';
           });
 
     //node.append('svg:text')
     //    .attr('text-anchor', 'middle')
-    //    .attr('dy', '.3em')
-    //    .text(function(d) { return d.className.substring(0, d.r / 3); });
+    //    .attr('dy', pluck('r'))
+    //    .text(function(d) { return d.name; });
 }
 
 function imageURL(img, x, y, w, h) {
@@ -258,6 +273,36 @@ function cat_by_id(id) {
 function sum_stats(i) {
   return i.atk + i.def + i.mag + i.mdef;
 }
+function pos_stats(i) {
+  return sum_stats(i) || 1e-6 || Number.MIN_VALUE;
+}
+
+function by_place(e) {
+  var name = 'object' === typeof e ? e.target.id : e
+    , x    = window.pageXOffset
+    , y    = window.pageYOffset
+    , id, p, i;
+  for (i = 0; p = locations[i]; i++)
+    if (p.name === name) {
+      id = p.id;
+      break;
+    }
+  if (!id) return;
+  by_character('Anyone'); // reset character view
+
+  P.classed('selected', 0);
+  D.classed('selected', 0).classed('chest', 0);
+  d3.select(document.getElementById(name).parentNode).classed('selected', 1);
+
+  I.transition().duration(250)
+    .style('opacity', function(item) {
+      return item.is_item ? is_at_place(id, item) ? 1 : 0.25 : 1;
+    });
+}
+
+function is_at_place(id, item) {
+  return item && (id == 'enemy' ? item.where.enemy > 1 : item.where[id]);
+}
 
 function by_dungeon(e) {
   var name = 'object' === typeof e ? e.target.id : e
@@ -274,6 +319,7 @@ function by_dungeon(e) {
   max = 10 + min;
   by_character('Anyone'); // reset character view
 
+  P.classed('selected', 0);
   D.classed('selected', 0).classed('chest', 0);
   d3.select(document.getElementById(name).parentNode).classed('selected', 1);
 
@@ -294,6 +340,7 @@ function is_in_dungeon(no, item) {
 function by_character(e) {
   var name = 'object' === typeof e ? e.target.id : e
     , any  = 'Anyone' === name
+    , now  = document.getElementById(name)
     , x    = window.pageXOffset
     , y    = window.pageYOffset
     , id, c, i;
@@ -305,9 +352,11 @@ function by_character(e) {
   if (!id && !any) return;
   //console.info(name);
 
+  P.classed('selected', 0);
   D.classed('chest', 0).classed('selected', 0);
   d3.select('.characters li.selected').classed('selected', 0);
-  d3.select(document.getElementById(name).parentNode).classed('selected', 1);
+  d3.select(now.parentNode).classed('selected', 1);
+  now.focus(); now.blur();
 
   I.transition()
       .duration(250)
@@ -320,7 +369,7 @@ function by_character(e) {
   ;
 
   // don't change on-screen scroll position when clicked
-  e.preventDefault();
+  if (e.preventDefault) e.preventDefault();
   location.hash = '#'+ name;
   window.scrollTo(x, y);
 }
