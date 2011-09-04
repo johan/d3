@@ -27,6 +27,19 @@ var style  = document.createElement('style')
 // url : array of item indices with that image
 d3.json('recettear/itemimages.json', init);
 
+function cluster_by_type(groups, item) {
+  var type  = item.type
+    , group = groups[item.type]
+    ;
+  if (!group) {
+    groups.children = (groups.children || []).concat(
+      groups[type] = group = { is_category: true, name: cat_by_id(type).name }
+    );
+  }
+  group.children = (group.children || []).concat(item);
+  return groups;
+}
+
 function init(item_urls) {
   var items_pane = d3.select('.items')
     , items_node = items_pane.node()
@@ -46,6 +59,8 @@ function init(item_urls) {
         .attr('height', 1)
         .attr('xlink:href', url);
   });
+
+  characters.forEach(function(c) { c.is_player = 1; });
 
   // sort characters by sex, to make some item usage distribution more intuitive
   characters.sort(function by_sex(a, b) {
@@ -115,8 +130,9 @@ function init(item_urls) {
 
   // 64 = item badge height, 120 = dungeon icon height
   items_node.style.height = (max_height - max_height % 64 - 120) + 'px';
-  document.body.addEventListener('mousemove', show_item, false);
-  document.body.addEventListener('DOMFocusIn', show_item, false);
+  d3.select(document.body)
+    .on('mousemove',  show_item)
+    .on('DOMFocusIn', show_item);
 
   by_character((location.hash || '').slice(1));
 }
@@ -124,12 +140,14 @@ function init(item_urls) {
 function bubbles() {
   var format = d3.format(",d")
     , fill = d3.scale.category20c()
+    , stats_items = items.filter(pluck('value'))
+    , stats_group = stats_items.reduce(cluster_by_type, {})
     ;
 
   var bubble = d3.layout.pack().sort(null).size([r, r]);
 
   var node = vis.selectAll('.node')
-        .data(bubble.nodes({ children: items.filter(pluck('value')) }))
+        .data(bubble.nodes(stats_group))
       .enter().append('svg:a')
         .attr('xlink:href', wiki_url)
         .attr('class', 'node item')
@@ -179,20 +197,29 @@ function imageURL(img, x, y, w, h) {
   return canvas.toDataURL('image/png');
 }
 
-function show_item(e) {
-  function is_user(ch) {
+function show_item() {
+  function can_use(ch) {
     if (!item || !item.chars) return false;
     return -1 !== item.chars.indexOf(ch.name);
   }
-  var at = e.target, item = at.__data__ || at.parentNode.__data__;
-  if (item && !item.is_item) item = false;
-  C.classed('user', is_user);
-
-  // if we're hovering the dungeon panel, don't touch it
-  if (!item || item.is_dungeon) return;
-  D.classed('chest', function(d) {
-    return item && is_in_dungeon(d.id, item);
-  });
+  function has_item(du) {
+    return item && is_in_dungeon(du.id, item);
+  }
+  var target  = d3.event && d3.event.target
+    , d       = target.correspondingUseElement ?
+                target.correspondingUseElement.__data__ : target.__data__
+    , item    = d && d.is_item    && d
+    , player  = d && d.is_player  && d
+    , dungeon = d && d.is_dungeon && d
+    ;
+  if (item) {
+    C.classed('user',  can_use);
+    D.classed('chest', has_item);
+  }
+  else { // remove hover effects, once hovering not-an-item
+    if (!dungeon) D.classed('chest', false);
+    if (!player)  C.classed('user',  false);
+  }
 }
 
 function y_pos(node) {
@@ -214,8 +241,18 @@ function wiki_url(item) {
   if (!item.name) return null;
   var name = (
       { "Assassin Blade": "Assassin's Blade"
+      , "Celebratory Walls": "Celebratory Wallpaper"
+      , "Tough Clothes": "Tough Clothing"
+      , "a Man's Fist": "A Man's Fist"
+      , 'the Tellbow': "The Tellbow"
       })[item.name] || item.name;
   return 'http://recettear.wikia.com/wiki/' + name.replace(/ /g, '_');
+}
+
+function cat_by_id(id) {
+  for (var i = 0, c; c = categories[i]; i++)
+    if (id == c.id) return c;
+  return null;
 }
 
 function sum_stats(i) {
