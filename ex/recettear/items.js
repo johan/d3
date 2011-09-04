@@ -283,5 +283,7 @@ function by_character(e) {
   ;
 
   // don't change on-screen scroll position when clicked
-  setTimeout(function() { window.scrollTo(x, y); }, 0);
+  e.preventDefault();
+  location.hash = '#'+ name;
+  window.scrollTo(x, y);
 }
