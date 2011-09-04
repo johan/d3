@@ -140,14 +140,14 @@ line.link {
 }
 
 /* "item X appears in a chest of dungeon Y" */
-.dungeon.chest a {
+.dungeon.chest a, .dungeon.selected.chest a {
   background: url("gfx/misc/chest.png") no-repeat bottom right;
+  opacity:    1.0;
 }
-/* sub-ideal; there's cognitive dissonance when you select a dungeon,
- * hover an item that isn't in that dungeon's chests, and the icon is
- * still lit. Any graphics artists out there that want to improve this? */
+/* "dungeon Y's chests may contain X items" */
 .dungeon.selected a {
-  background: url("gfx/misc/chest.png") no-repeat bottom right;
+  background: url("gfx/misc/avatar-bg.png") no-repeat 30px 30px;
+  opacity:    0.5;
 }
 
 
